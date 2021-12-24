@@ -1,4 +1,4 @@
-library flame_tiled;
+library flame_forge2d_tiled;
 
 export "src/extensions/point.dart";
 export "src/extensions/tile_set.dart";

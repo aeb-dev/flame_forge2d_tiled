@@ -3,7 +3,7 @@ import 'package:flame_forge2d/forge2d_game.dart';
 import 'package:flutter/foundation.dart';
 import 'package:tmx_parser/tmx_parser.dart';
 
-import '../flame_tiled.dart';
+import '../flame_forge2d_tiled.dart';
 
 class TiledGame extends Forge2DGame {
   late TmxMap tmxMap;
