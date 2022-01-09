@@ -131,12 +131,10 @@ class TiledMap extends BodyComponent<TiledGame> {
         throw "unexpected 'renderorder'";
     }
 
-    final layerOffset = Offset(
+    final Offset layerOffset = Offset(
       layer.offsetX,
       layer.offsetY,
     );
-
-    final Offset combinedOffset = layerOffset + baseOffset;
 
     for (int y = startY; y != endY; y += incY) {
       for (int x = startX; x != endX; x += incX) {
@@ -146,12 +144,12 @@ class TiledMap extends BodyComponent<TiledGame> {
         }
 
         // offset for the location on the canvas
-        final indexOffset = Offset(
+        final Offset indexOffset = Offset(
           x * _tmxMap.tileWidth,
           y * _tmxMap.tileHeight,
         );
 
-        final Offset offset = combinedOffset + indexOffset;
+        final Offset offset = layerOffset + baseOffset + indexOffset;
 
         _renderTile(
           canvas,
@@ -289,12 +287,12 @@ class TiledMap extends BodyComponent<TiledGame> {
 
   @override
   Body createBody() {
-    BodyDef bd = BodyDef();
+    final BodyDef bd = BodyDef();
     bd.position = Vector2.zero();
     bd.type = BodyType.static;
     bd.userData = this;
 
-    Body body = world.createBody(bd);
+    final Body body = world.createBody(bd);
 
     _createFixtureDefs(
       body,
@@ -490,7 +488,7 @@ class TiledMap extends BodyComponent<TiledGame> {
     }
 
     final FixtureDef fd = FixtureDef(shape);
-    fd.friction = 0.6;
+    fd.friction = object.properties?["friction"]?.value ?? 0.0;
     // fd.density = 1;
     // fd.friction = .5;
     body.createFixture(fd);
