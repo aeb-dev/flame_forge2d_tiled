@@ -1,3 +1,5 @@
 # Flame Forge2d Tiled
 
-Package to add Tiled support for the Flame game engine
+A package that combines [Tiled Map Editor](https://www.mapeditor.org) + [Flame Game Engine with Physics](https://github.com/flame-engine/flame)
+
+[Check example](https://github.com/aeb-dev/flame_forge2d_tiled/tree/main/example)
