@@ -12,6 +12,7 @@ environment:
 dependencies:
   flame: ^1.0.0
   flame_forge2d: ^0.8.3
+  forge2d: ^0.8.1
   tmx_parser: ^0.1.4
   flutter:
     sdk: flutter
