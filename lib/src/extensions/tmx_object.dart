@@ -1,9 +1,12 @@
-import 'package:flame/extensions.dart';
-import 'package:tmx_parser/tmx_parser.dart';
+import "package:flame/extensions.dart";
+import "package:tmx_parser/tmx_parser.dart";
 
+/// Extension functions on [TmxObject]
 extension TmxObjectExtensions on TmxObject {
-  Offset getOffset() => Offset(x, y);
+  /// Creates an [Offset] based on the position of the [TmxObject]
+  Offset getOffset() => Offset(this.x, this.y);
 
+  /// Creates an [Offset] to correct the alignment of the [TmxObject] according to the [objectAlignment]
   Offset getAlignedOffset(ObjectAlignment objectAlignment) {
     late Offset offset;
     switch (objectAlignment) {

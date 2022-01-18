@@ -1,36 +1,32 @@
-import 'dart:math';
-import 'dart:ui';
+import "dart:collection";
+import "dart:math";
+import "dart:ui";
 
-import 'package:flame/extensions.dart';
-import 'package:flame/flame.dart';
-import 'package:flame_forge2d/body_component.dart';
-import 'package:forge2d/forge2d.dart';
-import 'package:tmx_parser/tmx_parser.dart';
+import "package:flame/extensions.dart";
+import "package:flame/flame.dart";
+import "package:flame_forge2d/body_component.dart";
+import "package:forge2d/forge2d.dart";
+import "package:tmx_parser/tmx_parser.dart";
 
-import 'draw_context.dart';
-import 'extensions/point.dart';
-import 'extensions/tmx_object.dart';
-import 'tiled_game.dart';
+import "draw_context.dart";
+import "extensions/point.dart";
+import "extensions/tmx_object.dart";
+import "tiled_game.dart";
 
+/// The map with its physical objects
 class TiledMap extends BodyComponent<TiledGame> {
-  static Paint _paint = Paint();
+  static final Paint _paint = Paint();
   late TmxMap _tmxMap;
   late double _zoom;
 
-  TiledMap();
-
   @override
-  get debugMode => false;
-
-  // @override
-  // void update(double dt) {
-  //   super.update(dt);
-  // }
+  bool get debugMode => false;
 
   @override
   Future<void> onLoad() async {
     _tmxMap = super.gameRef.tmxMap;
     _zoom = super.gameRef.camera.zoom;
+
     await super.onLoad();
   }
 
@@ -38,56 +34,51 @@ class TiledMap extends BodyComponent<TiledGame> {
   void render(Canvas canvas) {
     super.render(canvas);
     _render(
-      canvas,
-      _tmxMap.renderOrderedLayers,
-      Offset.zero,
+      canvas: canvas,
+      layers: _tmxMap.renderOrderedLayers,
+      baseOffset: Offset.zero,
     );
   }
 
-  @override
-  void onGameResize(Vector2 gameSize) {
-    super.onGameResize(gameSize);
-  }
-
-  _render(
-    Canvas canvas,
-    List<dynamic> layerList,
-    Offset baseOffset,
-  ) {
-    layerList.where((layer) => layer.visible).forEach((layer) {
+  void _render({
+    required Canvas canvas,
+    required List<dynamic> layers,
+    required Offset baseOffset,
+  }) {
+    layers.where((layer) => layer.visible).forEach((layer) {
       if (layer is Layer) {
         _renderLayer(
-          canvas,
-          layer,
-          baseOffset,
+          canvas: canvas,
+          layer: layer,
+          baseOffset: baseOffset,
         );
       } else if (layer is ObjectGroup) {
         _renderObjectLayer(
-          canvas,
-          layer,
-          baseOffset,
+          canvas: canvas,
+          objectLayer: layer,
+          baseOffset: baseOffset,
         );
       } else if (layer is ImageLayer) {
         _renderImageLayer(
-          canvas,
-          layer,
-          baseOffset,
+          canvas: canvas,
+          imageLayer: layer,
+          baseOffset: baseOffset,
         );
       } else if (layer is Group) {
         _renderGroup(
-          canvas,
-          layer,
-          baseOffset,
+          canvas: canvas,
+          groupLayer: layer,
+          baseOffset: baseOffset,
         );
       }
     });
   }
 
-  void _renderLayer(
-    Canvas canvas,
-    Layer layer,
-    Offset baseOffset,
-  ) {
+  void _renderLayer({
+    required Canvas canvas,
+    required Layer layer,
+    required Offset baseOffset,
+  }) {
     int startX;
     int startY;
     int endX;
@@ -131,7 +122,7 @@ class TiledMap extends BodyComponent<TiledGame> {
         throw "unexpected 'renderorder'";
     }
 
-    final Offset layerOffset = Offset(
+    Offset layerOffset = Offset(
       layer.offsetX,
       layer.offsetY,
     );
@@ -144,56 +135,56 @@ class TiledMap extends BodyComponent<TiledGame> {
         }
 
         // offset for the location on the canvas
-        final Offset indexOffset = Offset(
+        Offset indexOffset = Offset(
           x * _tmxMap.tileWidth,
           y * _tmxMap.tileHeight,
         );
 
-        final Offset offset = layerOffset + baseOffset + indexOffset;
+        Offset offset = layerOffset + baseOffset + indexOffset;
 
         _renderTile(
-          canvas,
-          tileId,
-          offset,
+          canvas: canvas,
+          gid: tileId,
+          baseOffset: offset,
         );
       }
     }
   }
 
-  void _renderObjectLayer(
-    Canvas canvas,
-    ObjectGroup objectLayer,
-    Offset baseOffset,
-  ) {
-    final Offset layerOffset = Offset(
+  void _renderObjectLayer({
+    required Canvas canvas,
+    required ObjectGroup objectLayer,
+    required Offset baseOffset,
+  }) {
+    Offset layerOffset = Offset(
       objectLayer.offsetX,
       objectLayer.offsetY,
     );
 
-    final Offset offset = baseOffset + layerOffset;
+    Offset offset = baseOffset + layerOffset;
 
     objectLayer.objectMapById.values
         .where((object) => object.gid != null)
         .forEach(
           (object) => _renderObjectTile(
-            canvas,
-            object,
-            offset,
+            canvas: canvas,
+            object: object,
+            baseOffset: offset,
           ),
         );
   }
 
-  void _renderImageLayer(
-    Canvas canvas,
-    ImageLayer imageLayer,
-    Offset baseOffset,
-  ) {
-    final Offset layerOffset = Offset(
+  void _renderImageLayer({
+    required Canvas canvas,
+    required ImageLayer imageLayer,
+    required Offset baseOffset,
+  }) {
+    Offset layerOffset = Offset(
       imageLayer.offsetX,
       imageLayer.offsetY,
     );
 
-    final Offset offset = baseOffset + layerOffset;
+    Offset offset = baseOffset + layerOffset;
 
     canvas.drawImage(
       Flame.images.fromCache(imageLayer.image!.source!),
@@ -202,45 +193,39 @@ class TiledMap extends BodyComponent<TiledGame> {
     );
   }
 
-  void _renderGroup(
-    Canvas canvas,
-    Group groupLayer,
-    Offset baseOffset,
-  ) {
-    final Offset layerOffset = Offset(
+  void _renderGroup({
+    required Canvas canvas,
+    required Group groupLayer,
+    required Offset baseOffset,
+  }) {
+    Offset layerOffset = Offset(
       groupLayer.offsetX,
       groupLayer.offsetY,
     );
 
-    final Offset offset = baseOffset + layerOffset;
+    Offset offset = baseOffset + layerOffset;
     _render(
-      canvas,
-      groupLayer.renderOrderedLayers,
-      offset,
+      canvas: canvas,
+      layers: groupLayer.renderOrderedLayers,
+      baseOffset: offset,
     );
   }
 
-  void _renderTile(
-    Canvas canvas,
-    int gid,
-    Offset baseOffset,
-  ) {
-    final drawContext = DrawContext.createTileContext(
+  void _renderTile({
+    required Canvas canvas,
+    required int gid,
+    required Offset baseOffset,
+  }) {
+    DrawContext drawContext = DrawContext.createTileContext(
       tmxMap: _tmxMap,
       gid: gid,
       baseOffset: baseOffset,
       zoom: _zoom,
     );
 
-    // camera.
-    final Rect screenRect = camera.position.toPositionedRect(camera.gameSize);
+    Rect screenRect = camera.position.toPositionedRect(camera.gameSize);
 
-    final bool inViewport =
-        screenRect
-        .overlaps(drawContext.destinationRect);
-    // super.gameRef.camera.position.toPositionedRect(super.gameRef.camera)
-
-    // final bool inViewport = _screenRect.overlaps(drawContext.destinationRect);
+    bool inViewport = screenRect.overlaps(drawContext.destinationRect);
     if (!inViewport) {
       return;
     }
@@ -255,22 +240,21 @@ class TiledMap extends BodyComponent<TiledGame> {
     );
   }
 
-  void _renderObjectTile(
-    Canvas canvas,
-    TmxObject object,
-    Offset baseOffset,
-  ) {
-    final drawContext = DrawContext.createTileObjectContext(
+  void _renderObjectTile({
+    required Canvas canvas,
+    required TmxObject object,
+    required Offset baseOffset,
+  }) {
+    DrawContext drawContext = DrawContext.createTileObjectContext(
       tmxMap: _tmxMap,
       object: object,
       baseOffset: baseOffset,
       zoom: _zoom,
     );
 
-    final bool inViewport = camera.position
+    bool inViewport = camera.position
         .toPositionedRect(camera.gameSize)
         .overlaps(drawContext.destinationRect);
-    // final bool inViewport = _screenRect.overlaps(drawContext.destinationRect);
     if (!inViewport) {
       return;
     }
@@ -287,57 +271,74 @@ class TiledMap extends BodyComponent<TiledGame> {
 
   @override
   Body createBody() {
-    final BodyDef bd = BodyDef();
+    BodyDef bd = BodyDef();
     bd.position = Vector2.zero();
     bd.type = BodyType.static;
     bd.userData = this;
 
-    final Body body = world.createBody(bd);
+    Body body = world.createBody(bd);
+
+    Map<Vector2, Vector2> edges = {};
 
     _createFixtureDefs(
-      body,
-      _tmxMap.renderOrderedLayers,
+      body: body,
+      layers: _tmxMap.renderOrderedLayers,
+      edges: edges,
     );
+
+    // if there are edges on the map create chain for them
+    // visit every vertex with dfs
+    if (edges.isNotEmpty) {
+      _createChains(
+        body: body,
+        edges: edges,
+      );
+    }
 
     return body;
   }
 
-  void _createFixtureDefs(
-    Body body,
-    List<dynamic> layers, {
+  void _createFixtureDefs({
+    required Body body,
+    required List<dynamic> layers,
+    required Map<Vector2, Vector2> edges,
     Offset baseOffset = Offset.zero,
   }) {
-    layers.where((layer) => layer.visible).forEach((layer) {
+    for (dynamic layer in layers.where((layer) => layer.visible)) {
       if (layer is Layer) {
         _addLayerFixtures(
-          body,
-          layer,
+          body: body,
+          layer: layer,
+          edges: edges,
           baseOffset: baseOffset,
         );
       } else if (layer is ObjectGroup) {
         _addObjectLayerFixtures(
-          body,
-          layer,
+          body: body,
+          objectLayer: layer,
+          edges: edges,
           baseOffset: baseOffset,
         );
       } else if (layer is ImageLayer) {
         // do nothing
       } else if (layer is Group) {
         _addGroupLayerFixtures(
-          body,
-          layer,
+          body: body,
+          groupLayer: layer,
+          edges: edges,
           baseOffset: baseOffset,
         );
       }
-    });
+    }
   }
 
-  void _addLayerFixtures(
-    Body body,
-    Layer layer, {
+  void _addLayerFixtures({
+    required Body body,
+    required Layer layer,
+    required Map<Vector2, Vector2> edges,
     Offset baseOffset = Offset.zero,
   }) {
-    final Offset layerOffset = baseOffset +
+    Offset layerOffset = baseOffset +
         Offset(
           layer.offsetX,
           layer.offsetY,
@@ -350,14 +351,14 @@ class TiledMap extends BodyComponent<TiledGame> {
           continue;
         }
 
-        final TileSet tileSet = _tmxMap.getTileSetByGid(tileId);
-        final Tile? tile = tileSet.getTileByGid(tileId);
+        TileSet tileSet = _tmxMap.getTileSetByGid(tileId);
+        Tile? tile = tileSet.getTileByGid(tileId);
 
         if (tile == null) {
           continue;
         }
 
-        final Offset offset = layerOffset +
+        Offset offset = layerOffset +
             Offset(
               x * _tmxMap.tileWidth,
               y * _tmxMap.tileHeight,
@@ -368,66 +369,78 @@ class TiledMap extends BodyComponent<TiledGame> {
             );
 
         _addTileObjectFixtures(
-          body,
-          tileSet,
-          tile,
+          body: body,
+          tileSet: tileSet,
+          tile: tile,
+          edges: edges,
           baseOffset: offset,
         );
       }
     }
   }
 
-  void _addObjectLayerFixtures(
-    Body body,
-    ObjectGroup objectLayer, {
+  void _addObjectLayerFixtures({
+    required Body body,
+    required ObjectGroup objectLayer,
+    required Map<Vector2, Vector2> edges,
     Offset baseOffset = Offset.zero,
   }) {
-    objectLayer.objectMapById.values.forEach(
-      (object) {
-        Offset offset = baseOffset +
-            Offset(
-              objectLayer.offsetX,
-              objectLayer.offsetY,
-            );
-
-        if (object.gid != null) {
-          final TileSet tileSet = _tmxMap.getTileSetByGid(object.gid!);
-          final Tile tile = tileSet.getTileByGid(object.gid!)!;
-
-          final Offset alignment =
-              object.getAlignedOffset(tileSet.objectAlignment);
-
-          offset += Offset(object.x, object.y) + alignment;
-
-          _addTileObjectFixtures(
-            body,
-            tileSet,
-            tile,
-            baseOffset: offset,
+    for (TmxObject object in objectLayer.objectMapById.values) {
+      Offset offset = baseOffset +
+          Offset(
+            objectLayer.offsetX,
+            objectLayer.offsetY,
           );
-        } else {
-          _addObjectFixture(body, object, baseOffset: offset);
-        }
-      },
-    );
+
+      if (object.gid != null) {
+        TileSet tileSet = _tmxMap.getTileSetByGid(object.gid!);
+        Tile tile = tileSet.getTileByGid(object.gid!)!;
+
+        Offset alignment = object.getAlignedOffset(tileSet.objectAlignment);
+
+        offset += Offset(object.x, object.y) + alignment;
+
+        _addTileObjectFixtures(
+          body: body,
+          tileSet: tileSet,
+          tile: tile,
+          edges: edges,
+          baseOffset: offset,
+        );
+      } else {
+        _addObjectFixture(
+          body: body,
+          object: object,
+          edges: edges,
+          baseOffset: offset,
+        );
+      }
+    }
   }
 
-  void _addGroupLayerFixtures(
-    Body body,
-    Group group, {
+  void _addGroupLayerFixtures({
+    required Body body,
+    required Group groupLayer,
+    required Map<Vector2, Vector2> edges,
     Offset baseOffset = Offset.zero,
   }) {
     _createFixtureDefs(
-      body,
-      group.renderOrderedLayers,
-      baseOffset: baseOffset + Offset(group.offsetX, group.offsetY),
+      body: body,
+      layers: groupLayer.renderOrderedLayers,
+      edges: edges,
+      baseOffset: baseOffset +
+          Offset(
+            groupLayer.offsetX,
+            groupLayer.offsetY,
+          ),
     );
   }
 
-  void _addTileObjectFixtures(
-    Body body,
-    TileSet tileSet,
-    Tile tile, {
+  void _addTileObjectFixtures({
+    required Body body,
+    required TileSet tileSet,
+    required Tile tile,
+    required Map<Vector2, Vector2> edges,
     Offset baseOffset = Offset.zero,
   }) {
     if (tile.objectGroup?.objectMapById.isEmpty ?? true) {
@@ -440,20 +453,26 @@ class TiledMap extends BodyComponent<TiledGame> {
           tileSet.tileOffset.y,
         );
 
-    tile.objectGroup!.objectMapById.values.forEach(
-      (object) => _addObjectFixture(body, object, baseOffset: offset),
-    );
+    for (TmxObject object in tile.objectGroup!.objectMapById.values) {
+      _addObjectFixture(
+        body: body,
+        object: object,
+        edges: edges,
+        baseOffset: offset,
+      );
+    }
   }
 
-  void _addObjectFixture(
-    Body body,
-    TmxObject object, {
+  void _addObjectFixture({
+    required Body body,
+    required TmxObject object,
+    required Map<Vector2, Vector2> edges,
     Offset baseOffset = Offset.zero,
   }) {
     Iterable<Vector2> vertices =
         object.points!.map((point) => point.toVector2());
 
-    final Vector2 firstPoint = vertices.first;
+    Vector2 firstPoint = vertices.first;
     if (object.rotation != 0) {
       vertices = vertices.map((v) {
         v -= firstPoint;
@@ -463,12 +482,12 @@ class TiledMap extends BodyComponent<TiledGame> {
       });
     }
 
-    final Offset objectOffset = Offset(
+    Offset objectOffset = Offset(
       object.x,
       object.y,
     );
 
-    final Offset offset = baseOffset + objectOffset;
+    Offset offset = baseOffset + objectOffset;
 
     vertices = vertices
         .map((v) => Vector2(v.x + offset.dx, -(v.y + offset.dy)) / _zoom)
@@ -481,16 +500,106 @@ class TiledMap extends BodyComponent<TiledGame> {
 
       shape = ps;
     } else {
-      EdgeShape es = EdgeShape();
-      es.set(vertices.first, vertices.last);
+      Vector2? adj = edges[vertices.first];
+      if (adj != null) {
+        throw "No vertex should have more than one adjacent vertex";
+      }
 
-      shape = es;
+      edges[vertices.first] = vertices.last;
+      return;
     }
 
-    final FixtureDef fd = FixtureDef(shape);
+    FixtureDef fd = FixtureDef(shape);
     fd.friction = object.properties?["friction"]?.value ?? 0.0;
-    // fd.density = 1;
-    // fd.friction = .5;
+    body.createFixture(fd);
+  }
+
+  void _createChains({
+    required Body body,
+    required Map<Vector2, Vector2> edges,
+  }) {
+    Map<Vector2, bool> visitMap = Map.fromIterables(
+      edges.keys,
+      List<bool>.generate(
+        edges.length,
+        (index) => false,
+        growable: false,
+      ),
+    );
+
+    // create open chains
+    // find vertices that no other vertices are adjacent to
+    for (Vector2 vertex
+        in edges.keys.where((key) => !edges.values.contains(key))) {
+      List<Vector2> vertices = _traverseVertices(
+        edges: edges,
+        visitMap: visitMap,
+        vertex: vertex,
+      );
+      _createChain(
+        body: body,
+        vertices: vertices,
+        isClosed: false,
+      );
+    }
+
+    // create closed chains
+    // find vertices that are not visited
+    for (Vector2 vertex
+        in visitMap.entries.where((entry) => !entry.value).map((e) => e.key)) {
+      List<Vector2> vertices = _traverseVertices(
+        edges: edges,
+        visitMap: visitMap,
+        vertex: vertex,
+      );
+      _createChain(
+        body: body,
+        vertices: vertices,
+        isClosed: true,
+      );
+    }
+  }
+
+  List<Vector2> _traverseVertices({
+    required Map<Vector2, Vector2> edges,
+    required Map<Vector2, bool> visitMap,
+    required Vector2 vertex,
+  }) {
+    Queue<Vector2> verticesToVisit = Queue<Vector2>();
+    verticesToVisit.add(vertex);
+
+    List<Vector2> visitedVertices = List.empty(growable: true);
+
+    do {
+      vertex = verticesToVisit.removeFirst();
+      visitMap[vertex] = true;
+      visitedVertices.add(vertex);
+
+      Vector2? adj = edges[vertex];
+      // if chain is not a loop, visitMap[adj] will return null,
+      // in order to add last vertex to the map we return true by using null check false
+      if (adj != null && !(visitMap[adj] ?? false)) {
+        verticesToVisit.addFirst(adj);
+      }
+    } while (verticesToVisit.isNotEmpty);
+
+    return visitedVertices;
+  }
+
+  void _createChain({
+    required Body body,
+    required List<Vector2> vertices,
+    required bool isClosed,
+  }) {
+    ChainShape cs = ChainShape();
+    if (isClosed) {
+      cs.createLoop(vertices);
+    } else {
+      cs.createChain(vertices);
+    }
+
+    FixtureDef fd = FixtureDef(cs);
+    fd.friction = 0.0;
     body.createFixture(fd);
   }
 }
