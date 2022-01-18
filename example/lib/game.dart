@@ -1,9 +1,9 @@
-import 'package:flame/game.dart';
-import 'package:flame/input.dart';
+import "package:flame/game.dart";
+import "package:flame/input.dart";
 
-import 'package:flame_forge2d_tiled/flame_forge2d_tiled.dart';
+import "package:flame_forge2d_tiled/flame_forge2d_tiled.dart";
 
-import 'char.dart';
+import "char.dart";
 
 class GameInstance extends TiledGame
     with TapDetector, HasKeyboardHandlerComponents, FPSCounter {
@@ -11,7 +11,10 @@ class GameInstance extends TiledGame
 
   GameInstance({
     required String tmxFile,
-  }) : super(tmxFile: tmxFile) {
+  }) : super(
+          tmxFile: tmxFile,
+          zoom: 32,
+        ) {
     super.addContactCallback(AnimCharContactCallback());
   }
 
@@ -28,7 +31,7 @@ class GameInstance extends TiledGame
   void update(double dt) {
     super.update(dt);
 
-    final Vector2 bodyPosition = this.char.body.position.clone()..y *= -1;
+    Vector2 bodyPosition = this.char.body.position.clone()..y *= -1;
     super.camera.followVector2(bodyPosition);
   }
 }
