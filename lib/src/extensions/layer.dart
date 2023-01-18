@@ -1,5 +1,3 @@
-import "dart:ui";
-
 import "package:flame/extensions.dart";
 import "package:tmx_parser/tmx_parser.dart";
 

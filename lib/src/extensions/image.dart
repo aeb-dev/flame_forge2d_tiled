@@ -1,6 +1,4 @@
-import 'dart:ui';
-
-import 'package:flame/extensions.dart';
+import "package:flame/extensions.dart";
 
 extension ImageExtensions on Image {
   Vector2 get size => Vector2(

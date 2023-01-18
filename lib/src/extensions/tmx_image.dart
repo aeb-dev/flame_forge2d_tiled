@@ -5,7 +5,7 @@ import "package:tmx_parser/tmx_parser.dart";
 extension TmxImageExtensions on TmxImage {
   /// The size of the underlying [TmxImage]
   Vector2 get size => Vector2(
-        this.width!,
-        this.height!,
+        this.width!.toDouble(),
+        this.height!.toDouble(),
       );
 }

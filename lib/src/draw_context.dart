@@ -1,13 +1,10 @@
-import "dart:math";
 import "dart:ui";
 
 import "package:flame/components.dart";
-import "package:flame/flame.dart";
 import "package:tmx_parser/tmx_parser.dart";
 
-import "extensions/object_alignment.dart";
 import "extensions/tile_set.dart";
-import 'extensions/tmx_image.dart';
+import "extensions/tmx_image.dart";
 import "extensions/tmx_object.dart";
 
 /// A context for drawing tiles based on tile type
@@ -45,7 +42,7 @@ class DrawContext {
 
     Vector2 correctionOffset = Vector2(
       0.0,
-      tmxMap.tileHeight - tileSet.tileHeight,
+      tmxMap.tileHeight.toDouble() - tileSet.tileHeight.toDouble(),
     );
     Vector2 destinationOffset =
         (dstOffset + tileSet.offset + correctionOffset) / zoom;
@@ -72,8 +69,7 @@ class DrawContext {
       0.0,
       tmxMap.tileHeight - imageSize.y,
     );
-    Vector2 destinationOffset =
-        (dstOffset + correctionOffset) / zoom;
+    Vector2 destinationOffset = (dstOffset + correctionOffset) / zoom;
 
     RSTransform rs = RSTransform(
       1 / zoom,
@@ -94,7 +90,8 @@ class DrawContext {
     Rect sourceRect = sourceOffset & tileSet.tileSize;
     this.sourceRects.add(sourceRect);
 
-    Vector2 alignmentOffset = object.getAlignmentOffset(tileSet.objectAlignment);
+    Vector2 alignmentOffset =
+        object.getAlignmentOffset(tileSet.objectAlignment);
     Vector2 destinationOffset =
         (dstOffset + object.offset + tileSet.offset) / zoom;
 
@@ -119,7 +116,8 @@ class DrawContext {
     Rect sourceRect = Vector2.zero() & imageSize;
     this.sourceRects.add(sourceRect);
 
-    Vector2 alignmentOffset = object.getAlignmentOffset(tileSet.objectAlignment);
+    Vector2 alignmentOffset =
+        object.getAlignmentOffset(tileSet.objectAlignment);
     Vector2 destinationOffset =
         (dstOffset + object.offset + tileSet.offset) / zoom;
 

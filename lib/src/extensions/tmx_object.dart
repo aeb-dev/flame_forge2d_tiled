@@ -1,10 +1,10 @@
-import 'dart:math';
+import "dart:math";
 
 import "package:flame/extensions.dart";
-import 'package:flame_forge2d/flame_forge2d.dart';
+import "package:flame_forge2d/flame_forge2d.dart";
 import "package:tmx_parser/tmx_parser.dart";
 
-import '../../flame_forge2d_tiled.dart';
+import "point.dart";
 
 /// Extension functions on [TmxObject]
 extension TmxObjectExtensions on TmxObject {
@@ -62,16 +62,18 @@ extension TmxObjectExtensions on TmxObject {
     required double zoom,
     required Vector2 baseOffset,
   }) {
-    if (objectType == ObjectType.rectangle) {
-      points = [
-        const Point(0.0, 0.0),
-        Point(0.0, height),
-        Point(width, height),
-        Point(width, 0.0),
-      ];
+    if (objectType == ObjectType.rectangle && points.isEmpty) {
+      points.addAll(
+        [
+          Point.zero(),
+          Point.from(0.0, height),
+          Point.from(width, height),
+          Point.from(width, 0.0),
+        ],
+      );
     }
 
-    Iterable<Vector2> verticesIt = points!.map(
+    Iterable<Vector2> verticesIt = points.map(
       (point) => (point.toVector2() + baseOffset + offset) / zoom,
     );
 
@@ -87,7 +89,7 @@ extension TmxObjectExtensions on TmxObject {
 
     List<Vector2> vertices = verticesIt.toList();
 
-    bool chain = properties?["chain"]?.value ?? false;
+    bool chain = properties["chain"]?.value as bool? ?? false;
 
     if (chain) {
       if (objectType == ObjectType.polygon) {
@@ -129,15 +131,16 @@ extension TmxObjectExtensions on TmxObject {
         break;
       case ObjectType.point:
       case ObjectType.text:
+      default:
         throw "not supported";
     }
 
     FixtureDef fd = FixtureDef(shape);
-    fd.density = properties?["density"]?.value ?? 0.0;
-    fd.restitution = properties?["restitution"]?.value ?? 0.0;
-    fd.friction = properties?["friction"]?.value ?? 0.0;
-    fd.isSensor = properties?["isSensor"]?.value ?? false;
-    fd.userData = properties?["name"]?.value;
+    fd.density = properties["density"]?.value as double? ?? 0.0;
+    fd.restitution = properties["restitution"]?.value as double? ?? 0.0;
+    fd.friction = properties["friction"]?.value as double? ?? 0.0;
+    fd.isSensor = properties["isSensor"]?.value as bool? ?? false;
+    fd.userData = properties["name"]?.value;
 
     return fd;
   }

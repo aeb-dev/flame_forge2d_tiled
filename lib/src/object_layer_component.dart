@@ -2,12 +2,11 @@ import "dart:ui";
 
 import "package:flame/components.dart";
 import "package:flame/flame.dart";
-import 'package:forge2d/src/dynamics/fixture_def.dart';
-import 'package:forge2d/src/dynamics/body.dart';
+import "package:flame_forge2d/flame_forge2d.dart";
 import "package:tmx_parser/tmx_parser.dart";
 
 import "draw_context.dart";
-import 'extensions/layer.dart';
+import "extensions/layer.dart";
 import "extensions/object_alignment.dart";
 import "extensions/tile_set.dart";
 import "extensions/tmx_image.dart";
@@ -23,16 +22,16 @@ class ObjectLayerComponent extends LayerComponent<ObjectGroup> {
   Future<void> onLoad() async {
     await super.onLoad();
 
-    for (TmxObject tmxObject in layer.objectMapById.values
+    for (TmxObject tmxObject in layer.objects.values
         .where((object) => object.gid != null && object.visible)) {
       TileSet tileSet = tmxMap.getTileSetByGid(tmxObject.gid!);
       int tileId = tmxObject.gid! - tileSet.firstGid;
       Tile? tile = tileSet.getTileById(tileId);
       if (tileSet.image != null) {
-        Image image = Flame.images.fromCache(tileSet.image!.source!);
-        if (tile != null && tile.animation != null) {
+        Image image = Flame.images.fromCache(tileSet.image!.source);
+        if (tile != null && tile.animation.isNotEmpty) {
           List<SpriteAnimationFrameData> frameData = [];
-          for (Frame f in tile.animation!.frameList) {
+          for (Frame f in tile.animation) {
             Vector2 tileOffset = tileSet.getTileOffset(f.tileId);
             SpriteAnimationFrameData safd = SpriteAnimationFrameData(
               srcPosition: tileOffset,
@@ -67,14 +66,14 @@ class ObjectLayerComponent extends LayerComponent<ObjectGroup> {
           );
         }
       } else if (tile != null) {
-        Image image = Flame.images.fromCache(tile.image!.source!);
-        if (tile.animation != null) {
+        Image image = Flame.images.fromCache(tile.image!.source);
+        if (tile.animation.isNotEmpty) {
           List<Sprite> sprites = [];
           List<double> steps = [];
-          for (Frame f in tile.animation!.frameList) {
+          for (Frame f in tile.animation) {
             Sprite s = Sprite(
               Flame.images
-                  .fromCache(tileSet.getTileById(f.tileId)!.image!.source!),
+                  .fromCache(tileSet.getTileById(f.tileId)!.image!.source),
             );
             sprites.add(s);
             steps.add((f.duration / 1000).toDouble());
@@ -131,7 +130,7 @@ class ObjectLayerComponent extends LayerComponent<ObjectGroup> {
   Iterable<FixtureDef> createFixtures({
     required Map<Vector2, Vector2> edges,
   }) sync* {
-    for (TmxObject object in super.layer.objectMapById.values) {
+    for (TmxObject object in super.layer.objects.values) {
       if (object.gid != null) {
         TileSet tileSet = super.tmxMap.getTileSetByGid(object.gid!);
         Tile? tile = tileSet.getTileByGid(object.gid!);

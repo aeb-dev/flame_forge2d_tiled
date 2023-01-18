@@ -1,4 +1,4 @@
-import "dart:math" as math;
+import "dart:io";
 
 import "package:flame/flame.dart";
 import "package:flame_forge2d/flame_forge2d.dart";
@@ -31,15 +31,8 @@ class TiledGame extends Forge2DGame {
   @override
   @mustCallSuper
   Future<void> onLoad() async {
-    String xml = await Flame.bundle.loadString("assets/tiles/$tmxFile");
-    tmxMap = TmxMap.fromXmlString(xml);
-
-    // _zoom ??= math.min(
-    //   tmxMap.tileWidth,
-    //   tmxMap.tileHeight,
-    // );
-
-    // super.camera.zoom = _zoom!;
+    File file = File("assets/tiles/$tmxFile");
+    tmxMap = await TmxParser.fromFile(file);
 
     await _loadImages();
     await super.addAll(
@@ -56,18 +49,18 @@ class TiledGame extends Forge2DGame {
 
     for (TileSet tileSet in tmxMap.tileSets.values) {
       if (tileSet.image != null) {
-        filePathList.add(tileSet.image!.source!);
+        filePathList.add(tileSet.image!.source);
       } else {
         for (Tile tile in tileSet.tiles.values
             .where((tile) => tile.image?.source != null)) {
-          filePathList.add(tile.image!.source!);
+          filePathList.add(tile.image!.source);
         }
       }
     }
 
     for (ImageLayer imageLayer in tmxMap.imageLayers
         .where((imageLayer) => imageLayer.image?.source != null)) {
-      filePathList.add(imageLayer.image!.source!);
+      filePathList.add(imageLayer.image!.source);
     }
 
     await Flame.images.loadAll(filePathList);

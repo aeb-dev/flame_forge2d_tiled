@@ -1,6 +1,5 @@
-import "dart:math";
-
 import "package:flame/extensions.dart";
+import "package:tmx_parser/tmx_parser.dart";
 
 /// Extension functions on [Point]
 extension PointExtensions on Point {

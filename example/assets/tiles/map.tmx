@@ -1,14 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="80" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="3">
+<map version="1.9" tiledversion="1.9.0" orientation="orthogonal" renderorder="right-down" width="80" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="14">
  <tileset firstgid="1" name="floor" tilewidth="32" tileheight="32" tilecount="4" columns="2">
   <image source="../images/floor.png" width="64" height="64"/>
   <tile id="0">
+   <properties>
+    <property name="m" type="object" value="0"/>
+   </properties>
    <objectgroup draworder="index" id="2">
     <object id="1" x="0" y="0">
+     <properties>
+      <property name="m2" type="object" value="1"/>
+     </properties>
      <polyline points="0,0 32,0"/>
     </object>
    </objectgroup>
   </tile>
+  <wangsets>
+   <wangset name="Unnamed Set" type="corner" tile="-1">
+    <wangcolor name="" color="#ff0000" tile="-1" probability="1"/>
+    <wangcolor name="" color="#00ff00" tile="-1" probability="1"/>
+    <wangtile tileid="0" wangid="0,0,0,2,0,1,0,0"/>
+   </wangset>
+   <wangset name="Unnamed Set" type="mixed" tile="-1">
+    <wangcolor name="" color="#ff0000" tile="-1" probability="1"/>
+   </wangset>
+  </wangsets>
  </tileset>
  <tileset firstgid="5" name="collection" tilewidth="64" tileheight="64" tilecount="2" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
@@ -24,12 +40,12 @@
   <tile id="0">
    <image width="64" height="64" source="../images/char.png"/>
    <objectgroup draworder="index" id="2">
-    <object id="1" x="21.625" y="0.75" width="4.375" height="62">
+    <object id="1" x="21.625" y="0.75" width="4.375" height="60.1287">
      <properties>
       <property name="name" value="left"/>
      </properties>
     </object>
-    <object id="2" x="33.0625" y="0.75" width="4.375" height="62">
+    <object id="2" x="33.0625" y="0.75" width="4.375" height="64">
      <properties>
       <property name="name" value="right"/>
      </properties>
@@ -58,10 +74,28 @@
  </layer>
  <objectgroup id="4" name="walls">
   <object id="1" x="960" y="0">
-   <polyline points="0,0 -1.33333,316.667"/>
+   <polyline points="0,0 0,288"/>
   </object>
   <object id="2" x="0" y="0">
-   <polyline points="0,0 -1.33333,316.667"/>
+   <polyline points="0,0 0,320"/>
+  </object>
+  <object id="10" x="58.6667" y="135.333">
+   <properties>
+    <property name="chain" type="bool" value="true"/>
+   </properties>
+   <polygon points="0,0 1.33333,68 50.6667,75.3333 56,42.6667 32,29.3333 33.3333,-0.666667 20,-7.33333"/>
+  </object>
+  <object id="11" x="348.667" y="173.333">
+   <polygon points="0,0 30.6667,22 60,-31.3333 15.3333,-55.3333 4,-32"/>
+  </object>
+  <object id="12" x="164.667" y="132.667">
+   <properties>
+    <property name="chain" type="bool" value="true"/>
+   </properties>
+   <polygon points="0,0 23.3333,50.6667 72.6667,22.6667 56.6667,-16 12.6667,-26.6667"/>
+  </object>
+  <object id="13" x="247.333" y="199.333">
+   <polyline points="0,0 14,39.3333 88.6667,41.3333 76.6667,15.3333"/>
   </object>
  </objectgroup>
  <layer id="1" name="floor" width="80" height="30">

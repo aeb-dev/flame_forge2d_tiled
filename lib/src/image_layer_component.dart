@@ -1,8 +1,5 @@
-import "dart:ui";
-
-import 'package:flame/extensions.dart';
+import "package:flame/extensions.dart";
 import "package:flame/flame.dart";
-import 'package:forge2d/src/dynamics/fixture_def.dart';
 import "package:tmx_parser/tmx_parser.dart";
 
 import "layer_component.dart";
@@ -14,7 +11,7 @@ class ImageLayerComponent extends LayerComponent<ImageLayer> {
 
   ImageLayerComponent({
     required super.layer,
-  }) : image = Flame.images.fromCache(layer.image!.source!) {
+  }) : image = Flame.images.fromCache(layer.image!.source) {
     srcRect = image.getBoundingRect();
   }
 

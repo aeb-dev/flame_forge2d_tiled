@@ -1,9 +1,6 @@
 import "dart:ui";
 
-import 'package:forge2d/src/dynamics/fixture_def.dart';
-import 'package:forge2d/src/dynamics/body.dart';
 import "package:tmx_parser/tmx_parser.dart";
-import 'package:vector_math/vector_math_64.dart';
 
 import "layer_component.dart";
 

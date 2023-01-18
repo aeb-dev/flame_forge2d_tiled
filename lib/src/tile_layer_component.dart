@@ -1,15 +1,11 @@
-import "dart:ui";
-
 import "package:flame/components.dart";
 import "package:flame/extensions.dart";
 import "package:flame/flame.dart";
-import 'package:flame_forge2d/flame_forge2d.dart';
-import 'package:forge2d/src/dynamics/body.dart';
+import "package:flame_forge2d/flame_forge2d.dart";
 import "package:tmx_parser/tmx_parser.dart";
 
 import "../flame_forge2d_tiled.dart";
 import "draw_context.dart";
-import 'extensions/layer.dart';
 import "layer_component.dart";
 
 class TileLayerComponent extends LayerComponent<TileLayer> {
@@ -63,24 +59,24 @@ class TileLayerComponent extends LayerComponent<TileLayer> {
 
     for (int y = startY; y != endY; y += incY) {
       for (int x = startX; x != endX; x += incX) {
-        int gid = layer.tileMatrix[y][x];
+        int gid = super.layer.chunks[0].tileMatrix[y][x];
         if (gid == 0) {
           continue;
         }
 
         Vector2 indexOffset = Vector2(
-          x * tmxMap.tileWidth,
-          y * tmxMap.tileHeight,
+          x * tmxMap.tileWidth.toDouble(),
+          y * tmxMap.tileHeight.toDouble(),
         );
 
         TileSet tileSet = tmxMap.getTileSetByGid(gid);
         int tileId = gid - tileSet.firstGid;
         Tile? tile = tileSet.getTileById(tileId);
         if (tileSet.image != null) {
-          Image image = Flame.images.fromCache(tileSet.image!.source!);
-          if (tile != null && tile.animation != null) {
+          Image image = Flame.images.fromCache(tileSet.image!.source);
+          if (tile != null && tile.animation.isNotEmpty) {
             List<SpriteAnimationFrameData> frameData = [];
-            for (Frame f in tile.animation!.frameList) {
+            for (Frame f in tile.animation) {
               Vector2 tileOffset = tileSet.getTileOffset(f.tileId);
               SpriteAnimationFrameData safd = SpriteAnimationFrameData(
                 srcPosition: tileOffset,
@@ -101,7 +97,8 @@ class TileLayerComponent extends LayerComponent<TileLayer> {
               position: (indexOffset +
                       Vector2(
                         0.0,
-                        tmxMap.tileHeight - tileSet.tileHeight,
+                        tmxMap.tileHeight.toDouble() -
+                            tileSet.tileHeight.toDouble(),
                       )) /
                   zoom,
             );
@@ -118,14 +115,14 @@ class TileLayerComponent extends LayerComponent<TileLayer> {
             );
           }
         } else if (tile != null) {
-          Image image = Flame.images.fromCache(tile.image!.source!);
-          if (tile.animation != null) {
+          Image image = Flame.images.fromCache(tile.image!.source);
+          if (tile.animation.isNotEmpty) {
             List<Sprite> sprites = [];
             List<double> steps = [];
-            for (Frame f in tile.animation!.frameList) {
+            for (Frame f in tile.animation) {
               Sprite s = Sprite(
                 Flame.images
-                    .fromCache(tileSet.getTileById(f.tileId)!.image!.source!),
+                    .fromCache(tileSet.getTileById(f.tileId)!.image!.source),
               );
               sprites.add(s);
               steps.add((f.duration / 1000).toDouble());
@@ -143,7 +140,7 @@ class TileLayerComponent extends LayerComponent<TileLayer> {
               position: (indexOffset +
                       Vector2(
                         0.0,
-                        tmxMap.tileHeight - image.height,
+                        tmxMap.tileHeight.toDouble() - image.height,
                       )) /
                   zoom,
             );
@@ -187,7 +184,7 @@ class TileLayerComponent extends LayerComponent<TileLayer> {
   }) sync* {
     for (int y = 0; y < super.tmxMap.height; ++y) {
       for (int x = 0; x < super.tmxMap.width; ++x) {
-        int tileId = super.layer.tileMatrix[y][x];
+        int tileId = super.layer.chunks[0].tileMatrix[y][x];
         if (tileId == 0) {
           continue;
         }
@@ -200,13 +197,14 @@ class TileLayerComponent extends LayerComponent<TileLayer> {
         }
 
         Vector2 offset = Vector2(
-              x * super.tmxMap.tileWidth,
-              y * super.tmxMap.tileHeight,
+              x * super.tmxMap.tileWidth.toDouble(),
+              y * super.tmxMap.tileHeight.toDouble(),
             ) +
             Vector2(
               0,
-              super.tmxMap.tileHeight -
-                  (tile.image?.height ?? tileSet.tileHeight),
+              super.tmxMap.tileHeight.toDouble() -
+                  (tile.image?.height?.toDouble() ??
+                      tileSet.tileHeight.toDouble()),
             ) +
             tileSet.offset;
 

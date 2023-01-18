@@ -21,6 +21,7 @@ abstract class LayerComponent<T extends Layer>
   @protected
   TmxMap get tmxMap => super.gameRef.tmxMap;
 
+  @override
   @protected
   Camera get camera => super.gameRef.camera;
 
@@ -94,10 +95,8 @@ abstract class LayerComponent<T extends Layer>
   @protected
   Iterable<FixtureDef> createFixtures({
     required Map<Vector2, Vector2> edges,
-    // ignore: prefer_expression_function_bodies
-  }) sync* {
-    return;
-  }
+  }) =>
+      const Iterable.empty();
 
   @protected
   Iterable<FixtureDef> createTileObjectFixtures({
@@ -105,13 +104,13 @@ abstract class LayerComponent<T extends Layer>
     required Map<Vector2, Vector2> edges,
     required Vector2 baseOffset,
   }) sync* {
-    if (tile.objectGroup?.objectMapById.isEmpty ?? true) {
+    if (tile.objectGroup?.objects.isEmpty ?? true) {
       return;
     }
 
     baseOffset += layer.offset;
 
-    for (TmxObject object in tile.objectGroup!.objectMapById.values) {
+    for (TmxObject object in tile.objectGroup!.objects.values) {
       FixtureDef? fd = object.createFixture(
         edges: edges,
         zoom: zoom,
