@@ -1,23 +1,23 @@
 name: flame_forge2d_tiled
-description: A package that combines [Tiled Map Editor](https://www.mapeditor.org) + [Flame Game Engine with Physics](https://github.com/flame-engine/flame)
-version: 0.1.0
+description: A package that combines Tiled Map Editor + Flame Game Engine with Physics
+version: 0.2.0
 homepage: https://github.com/aeb-dev/flame_forge2d_tiled
 repository: https://github.com/aeb-dev/flame_forge2d_tiled
 issue_tracker: https://github.com/aeb-dev/flame_forge2d_tiled/issues
 
 environment:
-  sdk: ">=2.15.0 <3.0.0"
-  flutter: ">=2.5.0"
+  sdk: ">=2.18.0 <3.0.0"
+  flutter: ">=3.3.0"
 
 dependencies:
-  flame: ^1.0.0
-  flame_forge2d: ^0.8.3
-  forge2d: ^0.8.1
-  tmx_parser: ^0.1.4
   flutter:
     sdk: flutter
+  flame: ^1.6.0
+  flame_forge2d: ^0.12.5
+  tmx_parser: ^0.2.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  test: ^1.9.4
+  test: ^1.21.4
+  aeb_lint: ^1.0.0
