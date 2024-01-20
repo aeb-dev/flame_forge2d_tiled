@@ -1,6 +1,6 @@
 name: flame_forge2d_tiled
 description: A package that combines Tiled Map Editor + Flame Game Engine with Physics
-version: 0.2.0
+version: 0.3.0
 homepage: https://github.com/aeb-dev/flame_forge2d_tiled
 repository: https://github.com/aeb-dev/flame_forge2d_tiled
 issue_tracker: https://github.com/aeb-dev/flame_forge2d_tiled/issues

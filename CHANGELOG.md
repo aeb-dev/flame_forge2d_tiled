@@ -1,3 +1,8 @@
+## 0.3.0
+- Update packages
+- Fixes for new flame version
+- Fix lints
+
 ## 0.2.0
 
 - Draw optimization
