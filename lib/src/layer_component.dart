@@ -1,7 +1,7 @@
 import "dart:collection";
 import "dart:ui";
 
-import "package:flame/game.dart";
+import "package:flame/components.dart";
 import "package:flame_forge2d/flame_forge2d.dart";
 import "package:flutter/foundation.dart";
 import "package:tmx_parser/tmx_parser.dart";
@@ -16,17 +16,17 @@ import "tile_layer_component.dart";
 
 // TODO: use offsets as position
 
-abstract class LayerComponent<T extends Layer>
-    extends BodyComponent<TiledGame> {
+abstract class LayerComponent<T extends Layer> extends BodyComponent<TiledGame>
+    with HasGameRef<TiledGame> {
   @protected
   TmxMap get tmxMap => super.gameRef.tmxMap;
 
   @override
   @protected
-  Camera get camera => super.gameRef.camera;
+  CameraComponent get camera => super.gameRef.camera;
 
   @protected
-  double get zoom => this.camera.zoom;
+  double get zoom => this.camera.viewfinder.zoom;
 
   @protected
   late T layer;
@@ -60,19 +60,32 @@ abstract class LayerComponent<T extends Layer>
       ) as LayerComponent<T>;
     }
 
-    throw "Unknown layer type";
+    throw Exception("Unknown layer type");
+  }
+
+  @protected
+  void renderLayer(Canvas canvas);
+
+  @override
+  void render(Canvas canvas) {
+    if (!layer.visible) {
+      return;
+    }
+
+    renderLayer(canvas);
+    super.render(canvas);
   }
 
   @override
   Body createBody() {
-    BodyDef bd = BodyDef();
-    bd.position = Vector2.zero();
-    bd.type = BodyType.static;
-    bd.userData = this;
+    BodyDef bd = BodyDef()
+      ..position = Vector2.zero()
+      ..type = BodyType.static
+      ..userData = this;
 
     Body body = world.createBody(bd);
 
-    Map<Vector2, Vector2> edges = {};
+    Map<Vector2, Vector2> edges = <Vector2, Vector2>{};
 
     for (FixtureDef fd in createFixtures(edges: edges)) {
       body.createFixture(fd);
@@ -131,7 +144,7 @@ abstract class LayerComponent<T extends Layer>
       edges.keys,
       List<bool>.generate(
         edges.length,
-        (index) => false,
+        (int index) => false,
         growable: false,
       ),
     );
@@ -139,7 +152,7 @@ abstract class LayerComponent<T extends Layer>
     // create open chains
     // find vertices that no other vertices are adjacent to
     for (Vector2 vertex
-        in edges.keys.where((key) => !edges.values.contains(key))) {
+        in edges.keys.where((Vector2 key) => !edges.values.contains(key))) {
       List<Vector2> vertices = _traverseVertices(
         edges: edges,
         visitMap: visitMap,
@@ -154,7 +167,7 @@ abstract class LayerComponent<T extends Layer>
     // create closed chains
     // find vertices that are not visited
     for (MapEntry<Vector2, bool> entry
-        in visitMap.entries.where((e) => !e.value)) {
+        in visitMap.entries.where((MapEntry<Vector2, bool> e) => !e.value)) {
       List<Vector2> vertices = _traverseVertices(
         edges: edges,
         visitMap: visitMap,
@@ -172,8 +185,7 @@ abstract class LayerComponent<T extends Layer>
     required Map<Vector2, bool> visitMap,
     required Vector2 vertex,
   }) {
-    Queue<Vector2> verticesToVisit = Queue<Vector2>();
-    verticesToVisit.add(vertex);
+    Queue<Vector2> verticesToVisit = Queue<Vector2>()..add(vertex);
 
     List<Vector2> visitedVertices = List.empty(growable: true);
 
@@ -204,8 +216,7 @@ abstract class LayerComponent<T extends Layer>
       cs.createChain(vertices);
     }
 
-    FixtureDef fd = FixtureDef(cs);
-    fd.friction = 0.0;
+    FixtureDef fd = FixtureDef(cs)..friction = 0.0;
     return fd;
   }
 }

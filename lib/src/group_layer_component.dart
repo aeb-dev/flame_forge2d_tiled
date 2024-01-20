@@ -12,21 +12,21 @@ class GroupLayerComponent extends LayerComponent<Group> {
   @override
   Future<void> onLoad() async {
     List<LayerComponent> layerComponents = layer.renderOrderedLayers
-        .where((l) => l.visible)
+        .where((Layer l) => l.visible)
         .map(
-          (l) => LayerComponent.create(l),
+          (Layer l) => LayerComponent.create(l),
         )
         .toList();
 
-    await super.addAll(layerComponents);
+    await super.world.addAll(layerComponents);
     await super.onLoad();
   }
 
   @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-    canvas.save();
-    canvas.translate(layer.offsetX, layer.offsetY);
-    canvas.restore();
+  void renderLayer(Canvas canvas) {
+    canvas
+      ..save()
+      ..translate(layer.offsetX, layer.offsetY)
+      ..restore();
   }
 }

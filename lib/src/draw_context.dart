@@ -13,10 +13,10 @@ class DrawContext {
   late double zoom;
 
   /// The part of the image to draw
-  final List<Rect> sourceRects = [];
+  final List<Rect> sourceRects = <Rect>[];
 
   /// The part of the screen to draw
-  final List<RSTransform> rsTransforms = [];
+  final List<RSTransform> rsTransforms = <RSTransform>[];
 
   List<Color>? colors;
 

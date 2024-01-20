@@ -23,20 +23,21 @@ class ObjectLayerComponent extends LayerComponent<ObjectGroup> {
     await super.onLoad();
 
     for (TmxObject tmxObject in layer.objects.values
-        .where((object) => object.gid != null && object.visible)) {
+        .where((TmxObject object) => object.gid != null && object.visible)) {
       TileSet tileSet = tmxMap.getTileSetByGid(tmxObject.gid!);
       int tileId = tmxObject.gid! - tileSet.firstGid;
       Tile? tile = tileSet.getTileById(tileId);
       if (tileSet.image != null) {
         Image image = Flame.images.fromCache(tileSet.image!.source);
         if (tile != null && tile.animation.isNotEmpty) {
-          List<SpriteAnimationFrameData> frameData = [];
+          List<SpriteAnimationFrameData> frameData =
+              <SpriteAnimationFrameData>[];
           for (Frame f in tile.animation) {
             Vector2 tileOffset = tileSet.getTileOffset(f.tileId);
             SpriteAnimationFrameData safd = SpriteAnimationFrameData(
               srcPosition: tileOffset,
               srcSize: tileSet.tileSize,
-              stepTime: (f.duration / 1000).toDouble(),
+              stepTime: f.duration / 1000,
             );
             frameData.add(safd);
           }
@@ -52,31 +53,30 @@ class ObjectLayerComponent extends LayerComponent<ObjectGroup> {
             position: tmxObject.offset / zoom,
             angle: tmxObject.rotationInRadians,
           );
-          await super.add(sac);
+          await super.world.add(sac);
         } else {
-          DrawContext dc = super.drawContextMap[image] ??= DrawContext(
+          DrawContext _ = super.drawContextMap[image] ??= DrawContext(
             tmxMap: super.tmxMap,
             zoom: super.zoom,
-          );
-          dc.addTileSetObjectContext(
-            object: tmxObject,
-            tileId: tileId,
-            tileSet: tileSet,
-            dstOffset: Vector2.zero(),
-          );
+          )..addTileSetObjectContext(
+              object: tmxObject,
+              tileId: tileId,
+              tileSet: tileSet,
+              dstOffset: Vector2.zero(),
+            );
         }
       } else if (tile != null) {
         Image image = Flame.images.fromCache(tile.image!.source);
         if (tile.animation.isNotEmpty) {
-          List<Sprite> sprites = [];
-          List<double> steps = [];
+          List<Sprite> sprites = <Sprite>[];
+          List<double> steps = <double>[];
           for (Frame f in tile.animation) {
             Sprite s = Sprite(
               Flame.images
                   .fromCache(tileSet.getTileById(f.tileId)!.image!.source),
             );
             sprites.add(s);
-            steps.add((f.duration / 1000).toDouble());
+            steps.add(f.duration / 1000);
           }
 
           SpriteAnimation sp = SpriteAnimation.variableSpriteList(
@@ -92,27 +92,24 @@ class ObjectLayerComponent extends LayerComponent<ObjectGroup> {
             angle: tmxObject.rotationInRadians,
           );
 
-          await super.add(sac);
+          await super.world.add(sac);
         } else {
-          DrawContext dc = super.drawContextMap[image] ??= DrawContext(
+          DrawContext _ = super.drawContextMap[image] ??= DrawContext(
             tmxMap: super.tmxMap,
             zoom: super.zoom,
-          );
-          dc.addTileObjectContext(
-            object: tmxObject,
-            tileId: tileId,
-            tileSet: tileSet,
-            dstOffset: Vector2.zero(),
-          );
+          )..addTileObjectContext(
+              object: tmxObject,
+              tileId: tileId,
+              tileSet: tileSet,
+              dstOffset: Vector2.zero(),
+            );
         }
       }
     }
   }
 
   @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-
+  void renderLayer(Canvas canvas) {
     for (MapEntry<Image, DrawContext> c in drawContextMap.entries) {
       canvas.drawAtlas(
         c.key,

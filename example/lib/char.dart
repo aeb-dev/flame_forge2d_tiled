@@ -19,7 +19,8 @@ class Char extends BodyComponent<TiledGame>
     with
         KeyboardHandler,
         // ignore: prefer_mixin
-        ContactCallbacks {
+        ContactCallbacks,
+        HasGameRef<TiledGame> {
   late double _zoom;
   late Tile tile;
   late SpriteComponent sp;
@@ -29,13 +30,13 @@ class Char extends BodyComponent<TiledGame>
   Direction direction = Direction.right;
   PlayerState playerState = PlayerState.falling;
 
-  Set<LogicalKeyboardKey> keysPressed = {};
+  Set<LogicalKeyboardKey> keysPressed = <LogicalKeyboardKey>{};
 
   Char() : super(renderBody: false);
 
   @override
   Future<void> onLoad() async {
-    _zoom = super.gameRef.camera.zoom;
+    _zoom = super.gameRef.camera.viewfinder.zoom;
 
     TileSet tileSet = super.gameRef.tmxMap.tileSets["char"]!;
 
@@ -48,7 +49,7 @@ class Char extends BodyComponent<TiledGame>
       size: sprite.srcSize / _zoom,
     );
 
-    await super.add(sp);
+    await super.world.add(sp);
 
     await super.onLoad();
   }
@@ -78,7 +79,6 @@ class Char extends BodyComponent<TiledGame>
             super.body.applyLinearImpulse(Vector2(0, push));
             this.playerState = PlayerState.jumping;
           }
-          break;
         case "A":
           double velChange = -6 - super.body.linearVelocity.x;
           double push = velChange * super.body.mass;
@@ -87,7 +87,6 @@ class Char extends BodyComponent<TiledGame>
           if (!sp.transform.scale.x.isNegative) {
             sp.flipHorizontallyAroundCenter();
           }
-          break;
         case "S":
           break;
         case "D":
@@ -98,7 +97,6 @@ class Char extends BodyComponent<TiledGame>
           if (sp.transform.scale.x.isNegative) {
             sp.flipHorizontallyAroundCenter();
           }
-          break;
       }
     }
   }
@@ -107,11 +105,10 @@ class Char extends BodyComponent<TiledGame>
   void beginContact(Object other, Contact contact) {
     if (contact.fixtureA.isSensor || contact.fixtureB.isSensor) {
       String sensorName =
-          (contact.fixtureA.userData ?? contact.fixtureB.userData) as String;
+          (contact.fixtureA.userData ?? contact.fixtureB.userData)! as String;
       switch (sensorName) {
         case "down":
           this.contact++;
-          break;
       }
     }
   }
@@ -120,33 +117,32 @@ class Char extends BodyComponent<TiledGame>
   void endContact(Object other, Contact contact) {
     if (contact.fixtureA.isSensor || contact.fixtureB.isSensor) {
       String sensorName =
-          (contact.fixtureA.userData ?? contact.fixtureB.userData) as String;
+          (contact.fixtureA.userData ?? contact.fixtureB.userData)! as String;
       switch (sensorName) {
         case "down":
           this.contact--;
-          break;
       }
     }
   }
 
   @override
   Body createBody() {
-    BodyDef bd = BodyDef();
-    bd.position = Vector2(20, -20);
-    bd.type = BodyType.dynamic;
-    bd.userData = this;
-    bd.fixedRotation = true;
-    bd.gravityScale = Vector2(0, 10);
-    bd.linearDamping = 2;
-    bd.userData = this;
+    BodyDef bd = BodyDef()
+      ..position = Vector2(20, -20)
+      ..type = BodyType.dynamic
+      ..userData = this
+      ..fixedRotation = true
+      ..gravityScale = Vector2(0, 10)
+      ..linearDamping = 2
+      ..userData = this;
     Body body = world.createBody(bd);
 
     for (TmxObject object in this.tile.objectGroup!.objects.values) {
       FixtureDef fd = object.createFixture(
         zoom: _zoom,
         baseOffset: Vector2.zero(),
-      )!;
-      fd.density = 50;
+      )!
+        ..density = 50;
 
       body.createFixture(fd);
     }

@@ -1,5 +1,4 @@
 import "package:flame/input.dart";
-import "package:flame_forge2d/flame_forge2d.dart";
 import "package:flame_forge2d_tiled/flame_forge2d_tiled.dart";
 
 import "char.dart";
@@ -9,10 +8,9 @@ class GameInstance extends TiledGame
   late Char char;
 
   GameInstance({
-    required String tmxFile,
+    required super.tmxFile,
   }) : super(
-          tmxFile: tmxFile,
-          zoom: 32,
+          zoom: 1,
         );
 
   @override
@@ -21,13 +19,8 @@ class GameInstance extends TiledGame
 
     char = Char();
 
-    await super.add(char);
-  }
+    await super.world.add(char);
 
-  @override
-  void update(double dt) {
-    super.update(dt);
-
-    super.camera.followBodyComponent(char);
+    super.camera.follow(char);
   }
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: cascade_invocations
+
 import "package:flame/components.dart";
 import "package:flame/extensions.dart";
 import "package:flame/flame.dart";
@@ -30,7 +32,6 @@ class TileLayerComponent extends LayerComponent<TileLayer> {
         incY = 1;
         endX = layer.width;
         endY = layer.height;
-        break;
       case RenderOrder.rightUp:
         startX = 0;
         startY = layer.height - 1;
@@ -38,7 +39,6 @@ class TileLayerComponent extends LayerComponent<TileLayer> {
         incY = -1;
         endX = layer.width;
         endY = -1;
-        break;
       case RenderOrder.leftDown:
         startX = layer.width - 1;
         startY = 0;
@@ -46,7 +46,6 @@ class TileLayerComponent extends LayerComponent<TileLayer> {
         incY = 1;
         endX = -1;
         endY = layer.height;
-        break;
       case RenderOrder.leftUp:
         startX = layer.width - 1;
         startY = layer.height - 1;
@@ -54,7 +53,6 @@ class TileLayerComponent extends LayerComponent<TileLayer> {
         incY = -1;
         endX = -1;
         endY = -1;
-        break;
     }
 
     for (int y = startY; y != endY; y += incY) {
@@ -81,7 +79,7 @@ class TileLayerComponent extends LayerComponent<TileLayer> {
               SpriteAnimationFrameData safd = SpriteAnimationFrameData(
                 srcPosition: tileOffset,
                 srcSize: tileSet.tileSize,
-                stepTime: (f.duration / 1000).toDouble(),
+                stepTime: f.duration / 1000,
               );
               frameData.add(safd);
             }
@@ -125,7 +123,7 @@ class TileLayerComponent extends LayerComponent<TileLayer> {
                     .fromCache(tileSet.getTileById(f.tileId)!.image!.source),
               );
               sprites.add(s);
-              steps.add((f.duration / 1000).toDouble());
+              steps.add(f.duration / 1000);
             }
 
             SpriteAnimation sp = SpriteAnimation.variableSpriteList(
@@ -162,9 +160,7 @@ class TileLayerComponent extends LayerComponent<TileLayer> {
   }
 
   @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-
+  void renderLayer(Canvas canvas) {
     for (MapEntry<Image, DrawContext> c in super.drawContextMap.entries) {
       canvas.drawAtlas(
         c.key,

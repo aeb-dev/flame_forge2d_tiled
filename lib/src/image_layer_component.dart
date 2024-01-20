@@ -23,9 +23,8 @@ class ImageLayerComponent extends LayerComponent<ImageLayer> {
   }
 
   @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-
+  void renderLayer(Canvas canvas) {
+    // TODO: handle image repeat
     canvas.drawImageRect(
       image,
       srcRect,

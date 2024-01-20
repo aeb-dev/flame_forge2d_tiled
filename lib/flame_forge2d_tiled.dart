@@ -1,5 +1,3 @@
-library flame_forge2d_tiled;
-
 export "src/extensions/point.dart";
 export "src/extensions/tile_set.dart";
 export "src/extensions/tmx_image.dart";
